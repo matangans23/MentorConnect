@@ -94,8 +94,8 @@ def login():
 
 @app.route('/register', methods=['GET','POST'])
 def register():
-    form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
+    form = RegistrationForm()
+    if form.validate_on_submit():
         name = form.name.data
         year = form.year.data
         concentration = form.concentration.data
@@ -107,7 +107,7 @@ def register():
         helpp = helpp.split(", ")
         user.password = form.password.data # this calls the hash setter
         database_setup.addMentee(name, year, concentration, courses_taken, planned, helpp)
-    return render_template('register.html',form = request.form)
+    return render_template('new_user.html',form = form)
     # return redirect(url_for('register'))
 
 
