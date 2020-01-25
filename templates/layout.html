@@ -1,0 +1,60 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block head %}
+{{ super() }}
+
+<link rel="stylesheet" type="text/css" href="../static/internship_tracker.css">
+<link rel="shortcut icon" href="../static/images/favicon.ico">
+
+{% endblock %}
+
+{% block title %}Layout Template{% endblock %}
+
+{% block navbar %}
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Internship Tracker</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="/internships">Internships</a></li>
+              <li><a href="/documents">Documents</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+<!--              <li><a href="/login">Login<span class="sr-only">(current)</span></a></li>-->
+              <li><a class="login-logout" href="/logout">Logout</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+    $(document).ready(function () {
+      
+      let url = window.location;
+      
+      if (url.pathname != '/login' && url.pathname != '/logout') {
+        $('ul.nav a[href="'+ url +'"]').parent().addClass('active');
+        $('ul.nav a').filter(function() {
+          return this.href == url;
+        }).parent().addClass('active');
+      }
+      
+      if (url.pathname === '/login' || url.pathname === '/register') {
+        $('a.login-logout').text("Login")
+      }
+    });
+</script>
+{% endblock %}
