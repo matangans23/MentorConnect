@@ -4,14 +4,20 @@
 	<title></title>
 </head>
 <body>
-	<form action='/profile' method = 'POST'>
+	<form action="/profile" method='post'>
 	<label for="name">Name</label>
-    <input id="name" type="text" required/>
+    <input id= "name" type="text" required/>
     <label for="year">Year</label>
     <input id="year" type="text" required/>
     <label for="concentration">Concentration</label>
     <input id="concentration" type="text" required/>
-    <div class="input_fields_wrap">
+	<label for="courses_taken">Courses Taken</label>
+    <input id="courses_taken" type="text" required/>
+    <label for="planned">Planned Courses</label>
+    <input id="planned" type="text" required/>
+    <label for="help">Areas of Help</label>
+    <input id="help" type="text" required/>
+<!--     <div class="input_fields_wrap">
     <button class="add_field_button">Add More Fields</button>
     <div><input type="text" name="mytext[]"></div>
 	</div>
@@ -34,11 +40,7 @@
 		e.preventDefault(); $(this).parent('div').remove(); x--;
 	})
 	});
-	</script>
-    <input type="radio" name="daily" value="yes" id="yes"/>
-    <label for="yes">Yes, gladly!!</label>
-    <input type="radio" name="daily" value="no" id="no"/>
-    <label for="no">No, that’s impossible</label>
+	</script> -->
     <p></p>
     <input type="submit" value="Submit Response" />
 	</form>

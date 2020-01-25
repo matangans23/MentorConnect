@@ -21,7 +21,7 @@ from werkzeug import secure_filename
 from flask import send_file, send_from_directory, safe_join, abort
 from flask import current_app
 
-
+import database_setup
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "blah vlah"
@@ -47,18 +47,14 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Login')
 
-class RegistrationForm(FlaskForm):
-    username = StringField('Username')
-    email = StringField('Email Address', validators=[DataRequired()])
-    password = PasswordField('New Password', [
-        DataRequired(),
-        EqualTo('confirm', message='Passwords must match')
-    ])
-    confirm = PasswordField('Repeat Password')
-    remember_me = BooleanField('Keep me logged in')
+class RegistrationForm(FlaskForm):  
+    name = StringField('Name', validators=[DataRequired()])
+    year = StringField('Year', validators=[DataRequired()])
+    concentration =  StringField('Concentration', validators=[DataRequired()])
+    courses_taken = StringField('Courses Taken', validators=[DataRequired()])
+    planned = StringField('Courses Planned', validators=[DataRequired()])
+    helpp = StringField('Help', validators=[DataRequired()])
     submit = SubmitField('Register')
-    
-    
 # class InformationForm(FlaskForm):
 #     name = StringField('Name',validators=[DataRequired()])
 #     year = StringField('Year', validators=[DataRequired()])
@@ -96,32 +92,42 @@ def login():
 
     return render_template('user_login.html', form=form)
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET','POST'])
 def register():
-
-    # force logout
-    logout_user()
-
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
-        email = form.email.data
-        name = form.username.data
-        user = User(email=email, name=name)
+        name = form.name.data
+        year = form.year.data
+        concentration = form.concentration.data
+        courses_taken = form.courses_taken.data
+        courses_taken = courses_taken.split(", ")
+        planned = form.planned.data
+        planned = planned.split(", ")
+        helpp = form.helpp.data
+        helpp = helpp.split(", ")
         user.password = form.password.data # this calls the hash setter
-        try:
-            #user.tomongo()
-            login_user(user, form.remember_me.data)
-            return redirect(url_for('/newUserInfo'))
-        except Exception as e:
-            flash(str(e))
-
-    return render_template('new_user.html', form=form)
+        database_setup.addMentee(name, year, concentration, courses_taken, planned, helpp)
+    return render_template('register.html',form = request.form)
+    # return redirect(url_for('register'))
 
 
-@app.route('/newUserInfo', methods=['GET', 'POST'])
-@login_required
+@app.route('/profile', methods=['POST'])
 def add_information():
-	render_template('newUserForm.html')
+	if request.method == 'POST': 
+		name = request.form.get["name"]
+		year = request.form['year']
+		concentration = request.form['concentration']
+		courses_taken = request.form['courses_taken']
+		courses_taken = list(courses_taken)
+		planned  = request.form['planned']
+		planned = list(planned)
+		helpp = request.form['help']
+		helpp = list(helpp)
+		database_setup.addMentee(name, year, concentration, courses_taken, planned, helpp)
+		print(type(request.form))
+		print(request.form)
+		return render_template('profile.html',form = request.form)
+	return render_template('profile.html')
 # @app.route('/profile', methods=['GET','POST'])
 # @login_required
 # def load_user_info():
@@ -140,7 +146,7 @@ class UploadForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-    @app.route('/documents', methods=['GET', 'POST'])
+@app.route('/documents', methods=['GET', 'POST'])
 @login_required
 def documents():
     form = UploadForm(method='POST')
