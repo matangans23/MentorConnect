@@ -21,8 +21,19 @@ from werkzeug import secure_filename
 from flask import send_file, send_from_directory, safe_join, abort
 from flask import current_app
 from bson.json_util import dumps
-
+from pymongo import MongoClient
+import json
+import urllib
+from datetime import date
+import urllib.request
 import database_setup
+
+client = MongoClient('localhost', port=27018)
+
+db = client["mentor_connect"]
+
+collMentors = db["mentors"]
+collMentees = db["mentees"]
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "blah vlah"
@@ -112,9 +123,10 @@ def register():
         helpp = helpp.split(", ")
         #ser.password = form.password.data # this calls the hash setter
         database_setup.addMentee(brown_id, name, year, concentration, courses_taken, planned, helpp)
-        temp_id = database_setup.db.find( {"brown_id": brown_id})
+        temp_id = collMentees.find({"brown_id": brown_id})
         user_info = dumps(temp_id)
-        print(user_id)
+
+        print(user_info)
         print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
         return redirect('/profile')
     else:
@@ -125,7 +137,7 @@ def register():
 @app.route('/profile', methods=['GET','POST'])
 def add_information():
 
-	return render_template('profile.html')
+	return render_template('profile.html', name=user_info['name'])
 # @app.route('/profile', methods=['GET','POST'])
 # @login_required
 # def load_user_info():
