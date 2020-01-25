@@ -126,6 +126,75 @@ def add_information():
 # @login_required
 # def load_user_info():
 
+class UploadForm(FlaskForm):
+    file = FileField('Upload PDF Document', validators=[
+        FileRequired(),
+        FileAllowed(['pdf'], 'File extension must be ".pdf"')
+    ])
+    doc_type = RadioField('Document Type',
+                    default='resume',
+                    choices=[('resume','resume (most recent)'),
+                    ('cover-letter', 'cover letter (generic)'),
+                    ('transcript','transcript (most recent)')],
+                    validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
+    @app.route('/documents', methods=['GET', 'POST'])
+@login_required
+def documents():
+    form = UploadForm(method='POST')
+    user_id = session.get('user_id')
+#    with open('file.pdf', 'wb+') as f:
+#        cursor = db.documents.find()
+#        k = 0
+#        for i in cursor:
+#            if k == 2:
+#                f.write(i['file'])
+#            k += 1
+    if form.submit.data and form.validate_on_submit():
+        print(form.doc_type.data)
+        filename = secure_filename(form.file.data.filename)
+        doc_type = form.doc_type.data
+        bytes_file = form.file.data.read()
+        curr_dir = os.getcwd()
+        dir_path = curr_dir + "/static/client/" + user_id + "/" # appended / at the end of str
+        if not os.path.exists(dir_path):
+            # do not need to change dir_path here 
+            os.mkdir(dir_path)
+        with open(dir_path + doc_type +'.pdf', 'wb+') as f:
+            f.write(bytearray(bytes_file))
+
+        new_doc_for_mongo = {
+            'user_id' : ObjectId(user_id),
+            'filename' : filename,
+            'doc_type' : doc_type,
+            'file' : Binary(bytes_file)
+            }
+        db.documents.remove({'$and' : [{'user_id' : ObjectId(user_id)},{'doc_type' : doc_type}]})
+        db.documents.insert_one(new_doc_for_mongo)
+        form.file.data = ''
+        return redirect(url_for('documents'))
+    documents = list(db.documents.find({'user_id' : ObjectId(user_id)}))
+
+    return render_template('documents.html', form=form, documents=documents)
+
+@app.route("/get-pdf/<pdf_id>")
+@login_required
+def get_pdf(pdf_id):
+    user_id = session.get('user_id')
+    filename = pdf_id
+    # host_dir needs to change for each host. this will need to be updated for our server and for each local deployment case
+    host_dir = os.getcwd()
+    directory = host_dir + '/static/client/' + user_id + '/'
+
+    try:
+        return send_from_directory(directory=directory, filename=filename, as_attachment=True, mimetype='application/pdf')
+    except FileNotFoundError:
+        abort(404)
+
+
+
 @app.route('/logout')
 @login_required
 def logout():
