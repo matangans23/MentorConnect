@@ -31,7 +31,16 @@ app.config['SECRET_KEY'] = "blah vlah"
 
 Bootstrap(app)
 
+class User(UserMixin):
 
+    #initialize use with email and name. Initialized _id and password_hash to NOne
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+        self._id = None
+        self.password_hash = None
+	
+	
 class LoginForm(FlaskForm):
     email_or_user = StringField('Email or username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
