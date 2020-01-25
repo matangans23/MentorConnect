@@ -20,6 +20,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug import secure_filename
 from flask import send_file, send_from_directory, safe_join, abort
 from flask import current_app
+from bson.json_util import dumps
 
 import database_setup
 
@@ -39,15 +40,16 @@ class User(UserMixin):
         self.email = email
         self._id = None
         self.password_hash = None
-	
-	
+
+
 class LoginForm(FlaskForm):
     email_or_user = StringField('Email or username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Login')
 
-class RegistrationForm(FlaskForm):  
+class RegistrationForm(FlaskForm):
+    brown_id = StringField('Brown ID', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
     year = StringField('Year', validators=[DataRequired()])
     concentration =  StringField('Concentration', validators=[DataRequired()])
@@ -68,7 +70,7 @@ class RegistrationForm(FlaskForm):
 login_manager = LoginManager(app)
 login_manager.login_view = 'login' # route or function where login occurs...
 
-    
+
 @app.route('/')
 @login_required
 def index():
@@ -92,10 +94,13 @@ def login():
 
     return render_template('user_login.html', form=form)
 
+user_info = []
+
 @app.route('/register', methods=['GET','POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        brown_id = form.brown_id.data
         name = form.name.data
         year = form.year.data
         concentration = form.concentration.data
@@ -105,45 +110,38 @@ def register():
         planned = planned.split(", ")
         helpp = form.helpp.data
         helpp = helpp.split(", ")
-        user.password = form.password.data # this calls the hash setter
-        database_setup.addMentee(name, year, concentration, courses_taken, planned, helpp)
-    return render_template('new_user.html',form = form)
+        #ser.password = form.password.data # this calls the hash setter
+        database_setup.addMentee(brown_id, name, year, concentration, courses_taken, planned, helpp)
+        temp_id = database_setup.db.find( {"brown_id": brown_id})
+        user_info = dumps(temp_id)
+        print(user_id)
+        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+        return redirect('/profile')
+    else:
+        return render_template('user_login.html',form = form)
+
     # return redirect(url_for('register'))
 
-
-@app.route('/profile', methods=['POST'])
+@app.route('/profile', methods=['GET','POST'])
 def add_information():
-	if request.method == 'POST': 
-		name = request.form.get["name"]
-		year = request.form['year']
-		concentration = request.form['concentration']
-		courses_taken = request.form['courses_taken']
-		courses_taken = list(courses_taken)
-		planned  = request.form['planned']
-		planned = list(planned)
-		helpp = request.form['help']
-		helpp = list(helpp)
-		database_setup.addMentee(name, year, concentration, courses_taken, planned, helpp)
-		print(type(request.form))
-		print(request.form)
-		return render_template('profile.html',form = request.form)
+
 	return render_template('profile.html')
 # @app.route('/profile', methods=['GET','POST'])
 # @login_required
 # def load_user_info():
 
-class UploadForm(FlaskForm):
-    file = FileField('Upload PDF Document', validators=[
-        FileRequired(),
-        FileAllowed(['pdf'], 'File extension must be ".pdf"')
-    ])
-    doc_type = RadioField('Document Type',
-                    default='resume',
-                    choices=[('resume','resume (most recent)'),
-                    ('cover-letter', 'cover letter (generic)'),
-                    ('transcript','transcript (most recent)')],
-                    validators=[DataRequired()])
-    submit = SubmitField('Submit')
+# class UploadForm(FlaskForm):
+#     file = FileField('Upload PDF Document', validators=[
+#         FileRequired(),
+#         FileAllowed(['pdf'], 'File extension must be ".pdf"')
+#     ])
+#     doc_type = RadioField('Document Type',
+#                     default='resume',
+#                     choices=[('resume','resume (most recent)'),
+#                     ('cover-letter', 'cover letter (generic)'),
+#                     ('transcript','transcript (most recent)')],
+#                     validators=[DataRequired()])
+#     submit = SubmitField('Submit')
 
 
 @app.route('/documents', methods=['GET', 'POST'])
@@ -166,7 +164,7 @@ def documents():
         curr_dir = os.getcwd()
         dir_path = curr_dir + "/static/client/" + user_id + "/" # appended / at the end of str
         if not os.path.exists(dir_path):
-            # do not need to change dir_path here 
+            # do not need to change dir_path here
             os.mkdir(dir_path)
         with open(dir_path + doc_type +'.pdf', 'wb+') as f:
             f.write(bytearray(bytes_file))
@@ -210,6 +208,6 @@ def logout():
 
 
 
-    
+
 if __name__ == '__main__':
  app.run(debug=True, port=5000)
