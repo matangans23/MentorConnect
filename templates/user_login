@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{{ super() }}
+
+{% block title %}Login Page{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="page-header">
+    <h1>Login</h1>
+
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+  </div>
+  <div class="col-md-4">
+    {{ wtf.quick_form(form) }}
+    <hr>
+    <a href="/register">Register new user</a>
+  </div>
+
+</div>
+
+{% endblock %}
