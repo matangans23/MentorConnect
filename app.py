@@ -50,7 +50,14 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Register')
     
     
- 
+# class InformationForm(FlaskForm):
+#     name = StringField('Name',validators=[DataRequired()])
+#     year = StringField('Year', validators=[DataRequired()])
+#     concentration = StringField('Concentration',validators=[DataRequired()])
+#     courses_taken = String
+#     confirm = PasswordField('Repeat Password')
+#     remember_me = BooleanField('Keep me logged in')
+#     submit = SubmitField('Register')
 
 
 login_manager = LoginManager(app)
@@ -93,13 +100,22 @@ def register():
         user = User(email=email, name=name)
         user.password = form.password.data # this calls the hash setter
         try:
-            user.tomongo()
+            #user.tomongo()
             login_user(user, form.remember_me.data)
-            return redirect(url_for('internships'))
+            return redirect(url_for('/newUserInfo'))
         except Exception as e:
             flash(str(e))
 
     return render_template('new_user.html', form=form)
+
+
+@app.route('/newUserInfo', methods=['GET', 'POST'])
+@login_required
+def add_information():
+	render_template('newUserForm.html')
+# @app.route('/profile', methods=['GET','POST'])
+# @login_required
+# def load_user_info():
 
 @app.route('/logout')
 @login_required

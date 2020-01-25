@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<form action='/profile' method = 'POST'>
+	<label for="name">Name</label>
+    <input id="name" type="text" required/>
+    <label for="year">Year</label>
+    <input id="year" type="text" required/>
+    <label for="concentration">Concentration</label>
+    <input id="concentration" type="text" required/>
+    <div class="input_fields_wrap">
+    <button class="add_field_button">Add More Fields</button>
+    <div><input type="text" name="mytext[]"></div>
+	</div>
+	<script type="text/javascript">
+	$(document).ready(function() {
+	var max_fields      = 10; //maximum input boxes allowed
+	var wrapper   		= $(".input_fields_wrap"); //Fields wrapper
+	var add_button      = $(".add_field_button"); //Add button ID
+	
+	var x = 1; //initlal text box count
+	$(add_button).click(function(e){ //on add input button click
+		e.preventDefault();
+		if(x < max_fields){ //max input box allowed
+			x++; //text box increment
+			$(wrapper).append('<div><input type="text" name="mytext[]"/><a href="#" class="remove_field">Remove</a></div>'); //add input box
+		}
+	});
+	
+	$(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+		e.preventDefault(); $(this).parent('div').remove(); x--;
+	})
+	});
+	</script>
+    <input type="radio" name="daily" value="yes" id="yes"/>
+    <label for="yes">Yes, gladly!!</label>
+    <input type="radio" name="daily" value="no" id="no"/>
+    <label for="no">No, that’s impossible</label>
+    <p></p>
+    <input type="submit" value="Submit Response" />
+	</form>
+</body>
+</html>
