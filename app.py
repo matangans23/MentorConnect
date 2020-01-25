@@ -24,7 +24,7 @@ from flask import current_app
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ['APP_SECRET']
+app.config['SECRET_KEY'] = "blah vlah"
 #app.config['MONGO_URI'] = 'mongodb://localhost:27017/logindb'
 #mongo = PyMongo(app)
 #db = mongo.db
@@ -78,7 +78,7 @@ def login():
             return redirect(url_for('internships'))
         flash('invalid username or password.')
 
-    return render_template('login.html', form=form)
+    return render_template('user_login.html', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -99,7 +99,7 @@ def register():
         except Exception as e:
             flash(str(e))
 
-    return render_template('register.html', form=form)
+    return render_template('new_user.html', form=form)
 
 @app.route('/logout')
 @login_required
