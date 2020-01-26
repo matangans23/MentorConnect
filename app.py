@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os
 
 from flask import Flask
@@ -11,10 +12,8 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DateTimeField, RadioField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional
-from flask_table import Table, Col
 from flask_pymongo import PyMongo
 from bson import Binary
-from bson.objectid import ObjectId
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug import secure_filename
@@ -26,9 +25,10 @@ import json
 import urllib
 from datetime import date
 import urllib.request
-import database_setup
+from bson.json_util import dumps
+from queue import PriorityQueue
 
-client = MongoClient('localhost', port=27018)
+client = MongoClient('localhost', port=27017)
 
 db = client["mentor_connect"]
 
@@ -36,13 +36,27 @@ collMentors = db["mentors"]
 collMentees = db["mentees"]
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "blah vlah"
+# app.config['SECRET_KEY'] = "blah vlah"
+print("hey")
 #app.config['MONGO_URI'] = 'mongodb://localhost:27017/logindb'
 #mongo = PyMongo(app)
 #db = mongo.db
 
 Bootstrap(app)
+list_of_docs = []
 
+names = set()
+concentrations = set()
+courses = set()
+helped = set()
+
+for docs in collMentors.find():
+    names.add(docs['name'])
+    concentrations.add(docs['concentration'])
+    for course in docs['courses']:
+        courses.add(course)
+    for help in docs['areas_of_help']:
+        helped.add(help)
 class UploadForm(FlaskForm):
     file = FileField('Upload PDF Document', validators=[
         FileRequired(),
@@ -95,7 +109,7 @@ login_manager.login_view = 'login' # route or function where login occurs...
 @app.route('/')
 @login_required
 def index():
-    return redirect(url_for('internships'))
+    return redirect(url_for('/login'))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -132,14 +146,9 @@ def register():
         planned = form.planned.data
         planned = planned.split(", ")
         helpp = form.helpp.data
-        print(type(helpp))
-        print(helpp)
-        # helpp = helpp.split(", ")
-        #ser.password = form.password.data # this calls the hash setter
         database_setup.addMentee(brown_id, name, year, concentration, courses_taken, planned, helpp)
         temp_id_dictionary = collMentees.find({"brown_id": brown_id})[0]
         user_info = dict(temp_id_dictionary)
-        #user_info = dict(dumps(temp_id))
 
         print(user_info)
         print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
@@ -222,8 +231,49 @@ def logout():
     flash('You have been logged out')
     return redirect(url_for('login'))
 
+##### Hossam's Stuff
+
+@app.route('/search', methods=['POST', 'GET']) #TODO
+def main_page():
+    print(list_of_docs)
+    return render_template('filter_page.html', names=names, concentrations=concentrations, courses = courses, helped = helped, list_of_docs = list_of_docs)
+    # TODO: Handle serving the main page and AddForm submission here.
+
+@app.route("/query", methods=['POST']) #TODO
+def remove_todo():
+    print("Hello")
+    queryDict = {}
+    if request.form.get('name') is not '':
+        queryDict['name'] = request.form.get('name')
+    if request.form.get('concentration') is not '':
+        queryDict['concentration'] = request.form.get('concentration')
+    if request.form.get('multi') is not "None":
+        classes_list = request.form.get('multi')
+    if request.form.get('help') is not "None":
+        help = request.form.get('help')
+    q = PriorityQueue()
+    print(queryDict)
+    for mentors in collMentors.find(queryDict):
+        score = 0
+        if classes_list:
+            for classes in mentors["courses"]:
+                if classes in classes_list:
+                    score += 2
+        if help:
+            for helps in mentors['areas_of_help']:
+                if helps in help:
+                    score += 1
+        q.put((score, mentors["brown_id"]))
+    listoftop = []
+    counter = 0
+    while not q.empty():
+        listoftop.append(q.get())
+        counter += 1
+        if counter == 6:
+            break
+    for id_s in listoftop:
+        list_of_docs.append(collMentors.find({ "brown_id" : id_s[1] })[0])
+    return redirect("/search")
 
 
-
-if __name__ == '__main__':
- app.run(debug=True, port=5000)
+app.run(debug=True)
