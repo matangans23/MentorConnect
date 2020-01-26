@@ -1,8 +1,7 @@
-<!-- {% extends "layout.html" %}
-{{ super() }}
+{% extends "layout.html" %} 
 
-{% block content %}
-{% block title %} Top Results {% endblock %} -->
+
+ {% block content %}
 
 <!DOCTYPE HTML>
 <html>
@@ -29,80 +28,6 @@
     <div class = "category">
 
 <h3 style="position: relative; padding-left: 350px;">Search by:</h3>
-<!-- <form action="/query" method="post">
-        <table style="background-color: #ffffff; filter: alpha(opacity=40); opacity: 0.95;border:1px black solid;">
-            <tr>
-                <th>Name</th>
-                <th>
-                    <div class="dropdown" style="padding-left: 100px;">
-                    <button onclick="myFunction()" class="dropbtn">Select</button>
-                    <div id="myDropdown" class="dropdown-content">
-                      <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
-                      <a href="#about">About</a>
-                      <a href="#base">Base</a>
-                      <a href="#blog">Blog</a>
-                      <a href="#contact">Contact</a>
-                      <a href="#custom">Custom</a>
-                      <a href="#support">Support</a>
-                      <a href="#tools">Tools</a>
-                    </div>
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                <th>Concentration</th>
-                <th><div class="dropdown" style="padding-left: 100px;">
-                    <button onclick="myFunction1()" class="dropbtn">Select</button>
-                    <div id="myDropdown1" class="dropdown-content">
-                      <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction1()">
-                      <a href="#about">About</a>
-                      <a href="#base">Base</a>
-                      <a href="#blog">Blog</a>
-                      <a href="#contact">Contact</a>
-                      <a href="#custom">Custom</a>
-                      <a href="#support">Support</a>
-                      <a href="#tools">Tools</a>
-                    </div>
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                <th>Courses</th>
-                <th><div class="dropdown" style="padding-left: 100px;">
-                    <button onclick="myFunction2()" class="dropbtn">Select</button>
-                    <div id="myDropdown2" class="dropdown-content">
-                      <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction2()">
-                      <a href="#about">About</a>
-                      <a href="#base">Base</a>
-                      <a href="#blog">Blog</a>
-                      <a href="#contact">Contact</a>
-                      <a href="#custom">Custom</a>
-                      <a href="#support">Support</a>
-                      <a href="#tools">Tools</a>
-                    </div>
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                <th>Type of Advice</th>
-                <th><div class="dropdown" style="padding-left: 100px;">
-                    <button onclick="myFunction3()" class="dropbtn">Select</button>
-                    <div id="myDropdown3" class="dropdown-content">
-                      <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction3()">
-                      <a href="#about">About</a>
-                      <a href="#base">Base</a>
-                      <a href="#blog">Blog</a>
-                      <a href="#contact">Contact</a>
-                      <a href="#custom">Custom</a>
-                      <a href="#support">Support</a>
-                      <a href="#tools">Tools</a>
-                    </div>
-                    </div>
-                </th>
-            </tr>
-        </table>
-        <input type="submit" id="submit" value="query">
-    </form> -->
       </div>
       <form action="/query" method="post">
         <table style="background-color: #ffffff; filter: alpha(opacity=40); opacity: 0.95;border:1px black solid;">

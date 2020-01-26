@@ -1,0 +1,36 @@
+body {
+    font-family: "Times New Roman", Times, serif;
+}
+.nav-bar
+{
+	top: 0;
+	position: sticky;
+	z-index: 2;
+	min-height: 50px;
+}
+.navbar
+{
+	background-color: #ffffff;
+	border-bottom: 1px solid;
+}
+.navbar-brand
+{
+	color: red;
+	font-weight: bold;
+}
+.navbar-nav
+{
+	float: right;
+	text-align: right;
+}
+.nav-link
+{
+	color: #FFF;
+}
+
+.image
+{
+     float: left;
+     height: 50px;
+     width: 80px;
+}

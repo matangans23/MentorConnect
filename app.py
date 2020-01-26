@@ -325,7 +325,7 @@ def remove_todo():
     for mentors in collMentors.find(queryDict):
         score = 0
         if classes_list:
-            for classes in mentors["courses"]:
+            for classes in mentors["courses_taken"]:
                 if classes in classes_list:
                     score += 2
         if help:

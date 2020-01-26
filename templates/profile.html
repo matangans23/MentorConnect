@@ -1,42 +1,49 @@
 {% extends "layout.html" %}
-{{ super() }}
 
 {% block content %}
 
 <div class="container">
   <div class="page-header">
-    <h1>Welcome, {{ name }}!</h1>
+    <div class="col-md-4">
+      <div class="image">
+      <img src="../static/default_user_profile.png" alt="User Profile Picture" style="width:75%; vertical-align: center; height: 300%">
+      <b><h2>{{ name }}</h2></b>
+      </div>
+  </div>
+  <div class="col-md" style="float: left">
+    
     <h1>Concentrating in {{ concentration }} </h1>
-    <h1>Class of {{ year }}</h1>
+    <h3><b>Class of {{ year }} </b></h3>
     <h1>Courses Taken: </h1>
-    <ul id = 'taken_courses' >
+    <ul id = 'taken_courses' style="list-style: none;">
     {% for course in courses_taken %}
       <li> {{ course }} </li>
     {% endfor %}
   </ul>
   {% if planned is not none %}
     <h1> Tentative Courses: </h1>
-    <ul id = 'tentative_courses' >
+    <ul id = 'tentative_courses' style="list-style: none;" >
       {% for course in planned %}
       <li> {{ course }}  </li>
       {% endfor %}
     </ul>
     {% endif %}
     <h1> Areas I would like help in: </h1>
-    <ul id = 'areas of help' >
+    <ul id = 'areas of help' style="list-style: none;" >
     {% for area in helpp %}
     <li> {{ area }} </li>
     {% endfor %}
     </ul>
   {% if matched is not none %}
   <h1>Matched:</h1>
-  <ul>
+  <ul style="list-style: none;">
     {% for match in matched %}
     <li><h3>{{ match.name }}</h3></li>
     <li><h4>{{ match.email }}</h4></li>
     {% endfor %}
   </ul>
   {% endif %}
+</div>
     {% for message in get_flashed_messages() %}
     <div class="alert alert-warning">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -58,7 +65,7 @@
   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#ModalUploadForm">
     Add Document
   </button>
-</div>
+</div> -->
 <!-- Modal HTML Markup -->
 <div id="ModalUploadForm" class="modal fade">
     <div class="modal-dialog" role="document">

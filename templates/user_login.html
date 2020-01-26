@@ -1,5 +1,5 @@
-{% extends "layout.html" %}
-{{ super() }}
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}Login Page{% endblock %}
 
@@ -30,7 +30,9 @@
 </form> -->
     <a href="/register">Register new user</a>
   </div>
-
+  <div class= "col-md">
+    <img src="../static/logo.png">
+  </div>
 </div>
 
 {% endblock %}
