@@ -66,7 +66,9 @@ class RegistrationForm(FlaskForm):
     concentration =  StringField('Concentration', validators=[DataRequired()])
     courses_taken = StringField('Courses Taken', validators=[DataRequired()])
     planned = StringField('Courses Planned', validators=[DataRequired()])
-    helpp = SelectMultipleField(u'Areas of Help/Advising', choices=[('Concentration Choice/Declaration', 'Concentration Choice/Declaration'), ('Course Plan', 'Course Plan'), ('Internship/Career Advice', 'Plain Text'),('Extracurriculars', 'Extracurriculars'),('Study Tips', 'Study Tips')])
+    helpp = SelectMultipleField(u'Areas of Help/Advising', choices=[('Concentration Choice/Declaration',
+     'Concentration Choice/Declaration'), ('Course Plan', 'Course Plan'), ('Internship/Career Advice', 'Internship/Career Advice'),
+    ('Extracurriculars', 'Extracurriculars'),('Study Tips', 'Study Tips')])
     #helpp = RadioField('Areas of Help', choices = [('Concentration Choice/Declaration', 'Concentration Choice/Declaration'),('Internship/Career Advice', 'Internship/Career Advice'), ('Course Plan', 'Course Plan'), ('Extracurriculars', 'Extracurriculars'), ('Study Tips', 'Study Tips')], validators=[DataRequired()])
     submit = SubmitField('Register')
 # class InformationForm(FlaskForm):
@@ -144,38 +146,31 @@ def register():
 def add_information():
     print(user_info)
     print(request.form)
+    documents()
+    UploadForm()
     multiselect = request.form.getlist('mymultiselect')
     return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'])
-# @app.route('/profile', methods=['GET','POST'])
-# @login_required
-# def load_user_info():
-
-# class UploadForm(FlaskForm):
-#     file = FileField('Upload PDF Document', validators=[
-#         FileRequired(),
-#         FileAllowed(['pdf'], 'File extension must be ".pdf"')
-#     ])
-#     doc_type = RadioField('Document Type',
-#                     default='resume',
-#                     choices=[('resume','resume (most recent)'),
-#                     ('cover-letter', 'cover letter (generic)'),
-#                     ('transcript','transcript (most recent)')],
-#                     validators=[DataRequired()])
-#     submit = SubmitField('Submit')
 
 
-@app.route('/documents', methods=['GET', 'POST'])
-@login_required
+
+def load_user_info():
+    class UploadForm(FlaskForm):
+        file = FileField('Upload PDF Document', validators=[
+          FileRequired(),
+        FileAllowed(['jpg', 'png'], 'File extension must be ".png" or ".jpg')
+    ])
+        submit = SubmitField('Submit')
+
 def documents():
     form = UploadForm(method='POST')
     user_id = session.get('user_id')
-#    with open('file.pdf', 'wb+') as f:
-#        cursor = db.documents.find()
-#        k = 0
-#        for i in cursor:
-#            if k == 2:
-#                f.write(i['file'])
-#            k += 1
+    with open('file.pdf', 'wb+') as f:
+       cursor = db.documents.find()
+       k = 0
+       for i in cursor:
+           if k == 2:
+               f.write(i['file'])
+           k += 1
     if form.submit.data and form.validate_on_submit():
         print(form.doc_type.data)
         filename = secure_filename(form.file.data.filename)
@@ -198,8 +193,8 @@ def documents():
         db.documents.remove({'$and' : [{'user_id' : ObjectId(user_id)},{'doc_type' : doc_type}]})
         db.documents.insert_one(new_doc_for_mongo)
         form.file.data = ''
-        return redirect(url_for('documents'))
-    documents = list(db.documents.find({'user_id' : ObjectId(user_id)}))
+       # return redirect(url_for('documents'))
+   # documents = list(db.documents.find({'user_id' : ObjectId(user_id)}))
 
     return render_template('documents.html', form=form, documents=documents)
 
