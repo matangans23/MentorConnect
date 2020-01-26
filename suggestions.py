@@ -35,7 +35,7 @@ def suggest(brown_id):
 			if taken_course in mentor_course_set:
 				score_dict[mentor["brown_id"]] += 1
 		for i in range(0, len(mentor["areas_of_help"])):
-			if mentor["areas_of_help"][i] == mentee["areas_of_help"][i]:
+			if mentor["areas_of_help"][i] in mentee["areas_of_help"]:
 				score_dict[mentor["brown_id"]] += 4
 	print(score_dict)
 	topFive = {k: v for k, v in sorted(score_dict.items(), key=lambda item: item[1], reverse=True)}
