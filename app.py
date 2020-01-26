@@ -271,6 +271,8 @@ def logout():
     return redirect(url_for('login'))
 
 ##### Hossam's Stuff
+#list_of_docs = []
+global list_of_docs 
 list_of_docs = []
 @app.route('/search', methods=['POST', 'GET']) #TODO
 def main_page():
@@ -286,6 +288,7 @@ def main_page():
                 courses.add(course)
             for help in docs['areas_of_help']:
                 helped.add(help)
+        print(list_of_docs)
         return render_template('filter_page.html', names=names, concentrations=concentrations, courses = courses, helped = helped, list_of_docs = list_of_docs)
     else:
         names = set()
@@ -305,6 +308,9 @@ def main_page():
 @app.route("/query", methods=['POST']) #TODO
 def remove_todo():
     print("Hello")
+    global list_of_docs 
+    list_of_docs = None
+    list_of_docs = []
     queryDict = {}
     if request.form.get('name') is not '':
         queryDict['name'] = request.form.get('name')
@@ -334,8 +340,10 @@ def remove_todo():
         counter += 1
         if counter == 6:
             break
+        
     for id_s in listoftop:
         list_of_docs.append(collMentors.find({ "brown_id" : id_s[1] })[0])
+    print(list_of_docs)
     return redirect("/search")
 
 @app.route('/best')
