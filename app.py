@@ -59,9 +59,9 @@ for docs in collMentors.find():
     for help in docs['areas_of_help']:
         helped.add(help)
 class UploadForm(FlaskForm):
-    file = FileField('Upload PDF Document', validators=[
+    file = FileField('Upload Profile Picture', validators=[
         FileRequired(),
-        FileAllowed(['pdf'], 'File extension must be ".pdf"')
+        FileAllowed(['.jpg', '.png'], 'File extension must be ".jpg" or ".png"')
     ])
     submit = SubmitField('Submit')
     
@@ -165,14 +165,14 @@ def add_information():
     print(request.form)
     documents()
     print("YERRRRRRRRRRRRR")
-    return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'], form = form1)
+    return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'], form=form1)
 
 def documents():
     global form1
     form1 = UploadForm(method='POST')
     multiselect = request.form.getlist('mymultiselect')
     user_id = session.get('user_id')
-    with open('file.pdf', 'wb+') as f:
+    with open('file.jpg', 'wb+') as f:
        cursor = db.documents.find()
        k = 0
        for i in cursor:
@@ -186,10 +186,11 @@ def documents():
         bytes_file = form1.file.data.read()
         curr_dir = os.getcwd()
         dir_path = curr_dir + "/static/client/" + user_id + "/" # appended / at the end of str
+        print(dir_path)
         if not os.path.exists(dir_path):
             # do not need to change dir_path here
             os.mkdir(dir_path)
-        with open(dir_path + doc_type +'.pdf', 'wb+') as f:
+        with open(dir_path + doc_type +'.jpg', 'wb+') as f:
             f.write(bytearray(bytes_file))
 
         new_doc_for_mongo = {
