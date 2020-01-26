@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{{ super() }}
+
+{% block content %}
+{% block title %} Profile Page {% endblock %}
+
+{% for entry in list %}
+
+<h1>{{ entry.name }}</h1>
+<h3> {{ entry.concentration }}</h3>
+<ul>
+    {% for class in entry.courses_taken %}
+    <li>{{ class }}</li>
+    {% endfor %}
+</ul>
+{% endfor %}
+
+{% endblock %}
