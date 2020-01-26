@@ -27,6 +27,7 @@ from datetime import date
 import urllib.request
 from bson.json_util import dumps
 from queue import PriorityQueue
+import database_setup
 
 client = MongoClient('localhost', port=27017)
 
@@ -36,7 +37,7 @@ collMentors = db["mentors"]
 collMentees = db["mentees"]
 
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = "blah vlah"
+app.config['SECRET_KEY'] = "blah vlah"
 print("hey")
 #app.config['MONGO_URI'] = 'mongodb://localhost:27017/logindb'
 #mongo = PyMongo(app)
@@ -276,4 +277,4 @@ def remove_todo():
     return redirect("/search")
 
 
-app.run(debug=True)
+app.run()
