@@ -1,0 +1,52 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block head %}
+{{ super() }}
+
+<link rel="stylesheet" type="text/css" href="../static/css/layout.css">
+
+{% endblock %}
+
+{% block title %}Layout Template{% endblock %}
+
+{% block navbar %}
+      <!-- Static navbar -->
+      <div class="nav-bar">
+      <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="#">
+              <img src="../static/logo.png" style="height:55px; width: 100px"></a>
+        
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <ul class="nav navbar-nav">
+              <li><a href="/profile">My Profile </a></li>
+              <li><a href="/documents">Documents</a></li>
+              <li><a href="/logout">Login/Logout</a></li>
+            </ul>
+          </ul>
+      </div>
+        </nav>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+    $(document).ready(function () {
+      
+      let url = window.location;
+      
+      if (url.pathname != '/login' && url.pathname != '/logout') {
+        $('ul.nav a[href="'+ url +'"]').parent().addClass('active');
+        $('ul.nav a').filter(function() {
+          return this.href == url;
+        }).parent().addClass('active');
+      }
+      
+      if (url.pathname === '/login' || url.pathname === '/register') {
+        $('a.login-logout').text("Login")
+      }
+    });
+</script>
+{% endblock %}
