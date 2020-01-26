@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css" type="text/css">
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.js"></script>
+        <link rel="stylesheet" href="style.css">
+        <script src="filter.js"></script>
+<script src="filter1.js"></script>
+<script src="filter2.js"></script>
+<script src="filter3.js"></script>
+
+
+</head>
+<body>
+
+<h2 style="text-align: center">Find a Mentor</h2>
+    <div class = "category">
+
+<h3 style="position: relative; padding-left: 350px;">Search by:</h3>
+<!-- <form action="/query" method="post">
+        <table style="background-color: #ffffff; filter: alpha(opacity=40); opacity: 0.95;border:1px black solid;">
+            <tr>
+                <th>Name</th>
+                <th>
+                    <div class="dropdown" style="padding-left: 100px;">
+                    <button onclick="myFunction()" class="dropbtn">Select</button>
+                    <div id="myDropdown" class="dropdown-content">
+                      <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
+                      <a href="#about">About</a>
+                      <a href="#base">Base</a>
+                      <a href="#blog">Blog</a>
+                      <a href="#contact">Contact</a>
+                      <a href="#custom">Custom</a>
+                      <a href="#support">Support</a>
+                      <a href="#tools">Tools</a>
+                    </div>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>Concentration</th>
+                <th><div class="dropdown" style="padding-left: 100px;">
+                    <button onclick="myFunction1()" class="dropbtn">Select</button>
+                    <div id="myDropdown1" class="dropdown-content">
+                      <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction1()">
+                      <a href="#about">About</a>
+                      <a href="#base">Base</a>
+                      <a href="#blog">Blog</a>
+                      <a href="#contact">Contact</a>
+                      <a href="#custom">Custom</a>
+                      <a href="#support">Support</a>
+                      <a href="#tools">Tools</a>
+                    </div>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>Courses</th>
+                <th><div class="dropdown" style="padding-left: 100px;">
+                    <button onclick="myFunction2()" class="dropbtn">Select</button>
+                    <div id="myDropdown2" class="dropdown-content">
+                      <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction2()">
+                      <a href="#about">About</a>
+                      <a href="#base">Base</a>
+                      <a href="#blog">Blog</a>
+                      <a href="#contact">Contact</a>
+                      <a href="#custom">Custom</a>
+                      <a href="#support">Support</a>
+                      <a href="#tools">Tools</a>
+                    </div>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>Type of Advice</th>
+                <th><div class="dropdown" style="padding-left: 100px;">
+                    <button onclick="myFunction3()" class="dropbtn">Select</button>
+                    <div id="myDropdown3" class="dropdown-content">
+                      <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction3()">
+                      <a href="#about">About</a>
+                      <a href="#base">Base</a>
+                      <a href="#blog">Blog</a>
+                      <a href="#contact">Contact</a>
+                      <a href="#custom">Custom</a>
+                      <a href="#support">Support</a>
+                      <a href="#tools">Tools</a>
+                    </div>
+                    </div>
+                </th>
+            </tr>
+        </table>
+        <input type="submit" id="submit" value="query">
+    </form> -->
+      </div>
+      <form action="/query" method="post">
+        <table style="background-color: #ffffff; filter: alpha(opacity=40); opacity: 0.95;border:1px black solid;">
+        <tr>
+            <th>Name</th>
+            
+            <th><input type = "text" list = "names" name="name"> 
+        <datalist id = "names">
+          {% for name in names %}
+          <option value = '{{ name }}'>
+            {% endfor %}
+        </datalist></th>
+    </tr>
+    <tr>
+        <th>Concentration</th>
+        
+        <th><input type = "text" list = "concs" name="concentration"> 
+        <datalist id = "concs">
+          {% for conc in concentrations %}
+      <option value = '{{ conc }}'>
+        {% endfor %}
+    </datalist></th>
+</tr>
+<tr>
+  <th>Courses</th>
+  
+  <th>   <script type="text/javascript">
+    $(document).ready(function() {
+        $('#boot-multiselect-demo').multiselect({
+        includeSelectAllOption: true,
+        buttonWidth: 250,
+        enableFiltering: true
+    });
+    });
+</script>  <select id="boot-multiselect-demo" name="multi" multiple="multiple">
+    {% for course in courses %}
+    
+    <option value="{{ course }}">{{ course }}</option>
+    {% endfor %}
+</select>
+</th>
+</tr>
+<tr>
+  <th>Helped</th>
+  
+  <th>   <script type="text/javascript">
+    $(document).ready(function() {
+        $('#boot-multiselect-demo1').multiselect({
+        includeSelectAllOption: true,
+        buttonWidth: 250,
+        enableFiltering: true
+    });
+    });
+</script>
+ <select id="boot-multiselect-demo1" name = "help" multiple="multiple">
+   {% for helps in helped %}
+        <option value="{{ helps }}">{{ helps }}</option>
+    {% endfor %}
+</select>
+</th>
+</tr>
+<tr>
+    <th></th>
+    <th>        <input type = "submit" id = "submit">
+    </th>
+</tr>
+        </table>
+      </form>
+
+
+{% for entry in list_of_docs %}
+<h1> {{ entry.name }}</h1>
+<h2>Classes Taken:</h2>
+<ul>
+ {% for class in entry.courses %}
+    <li> {{ class }}</li>
+ {% endfor %}
+ </ul>
+<h2> Willing to Help With:</h2>
+<ul>
+  {% for help in entry.areas_of_help %}
+    <li> {{ help }}</li>
+ {% endfor %}
+</ul>
+{% endfor %}
+</body>
+</html>
+
