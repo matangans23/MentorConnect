@@ -9,7 +9,7 @@ from flask import render_template, redirect, request, url_for, flash, session
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DateTimeField, RadioField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DateTimeField, RadioField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional
 from flask_table import Table, Col
 from flask_pymongo import PyMongo
@@ -66,10 +66,11 @@ class RegistrationForm(FlaskForm):
     concentration =  StringField('Concentration', validators=[DataRequired()])
     courses_taken = StringField('Courses Taken', validators=[DataRequired()])
     planned = StringField('Courses Planned', validators=[DataRequired()])
-    helpp = StringField('Help', validators=[DataRequired()])
+    helpp = SelectMultipleField(u'Areas of Help/Advising', choices=[('Concentration Choice/Declaration', 'Concentration Choice/Declaration'), ('Course Plan', 'Course Plan'), ('Internship/Career Advice', 'Plain Text'),('Extracurriculars', 'Extracurriculars'),('Study Tips', 'Study Tips')])
+    #helpp = RadioField('Areas of Help', choices = [('Concentration Choice/Declaration', 'Concentration Choice/Declaration'),('Internship/Career Advice', 'Internship/Career Advice'), ('Course Plan', 'Course Plan'), ('Extracurriculars', 'Extracurriculars'), ('Study Tips', 'Study Tips')], validators=[DataRequired()])
     submit = SubmitField('Register')
 # class InformationForm(FlaskForm):
-#     name = StringField('Name',validators=[DataRequired()])
+#     name = StringField('Name',validators=[DataRequired()]), 
 #     year = StringField('Year', validators=[DataRequired()])
 #     concentration = StringField('Concentration',validators=[DataRequired()])
 #     courses_taken = String
@@ -105,10 +106,12 @@ def login():
 
     return render_template('user_login.html', form=form)
 
-user_info = []
+
 
 @app.route('/register', methods=['GET','POST'])
 def register():
+    global user_info
+    user_info = None
     form = RegistrationForm()
     if form.validate_on_submit():
         brown_id = form.brown_id.data
@@ -120,11 +123,14 @@ def register():
         planned = form.planned.data
         planned = planned.split(", ")
         helpp = form.helpp.data
-        helpp = helpp.split(", ")
+        print(type(helpp))
+        print(helpp)
+        # helpp = helpp.split(", ")
         #ser.password = form.password.data # this calls the hash setter
         database_setup.addMentee(brown_id, name, year, concentration, courses_taken, planned, helpp)
-        temp_id = collMentees.find({"brown_id": brown_id})
-        user_info = dumps(temp_id)
+        temp_id_dictionary = collMentees.find({"brown_id": brown_id})[0]
+        user_info = dict(temp_id_dictionary)
+        #user_info = dict(dumps(temp_id))
 
         print(user_info)
         print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
@@ -136,8 +142,10 @@ def register():
 
 @app.route('/profile', methods=['GET','POST'])
 def add_information():
-
-	return render_template('profile.html', name=user_info['name'])
+    print(user_info)
+    print(request.form)
+    multiselect = request.form.getlist('mymultiselect')
+    return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'])
 # @app.route('/profile', methods=['GET','POST'])
 # @login_required
 # def load_user_info():
