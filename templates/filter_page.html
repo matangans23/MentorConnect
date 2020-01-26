@@ -166,9 +166,20 @@
       </form>
 
 
-</div>
 {% for entry in list_of_docs %}
 <h1> {{ entry.name }}</h1>
+<h2>Classes Taken:</h2>
+<ul>
+ {% for class in entry.courses %}
+    <li> {{ class }}</li>
+ {% endfor %}
+ </ul>
+<h2> Willing to Help With:</h2>
+<ul>
+  {% for help in entry.areas_of_help %}
+    <li> {{ help }}</li>
+ {% endfor %}
+</ul>
 {% endfor %}
 </body>
 </html>

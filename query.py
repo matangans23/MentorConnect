@@ -17,6 +17,7 @@ from queue import PriorityQueue
 
 
 client = MongoClient('localhost', port=27017)
+list_of_docs = []
 
 db = client["mentor_connect"]
 
@@ -34,7 +35,6 @@ names = set()
 concentrations = set()
 courses = set()
 helped = set()
-list_of_docs = []
 
 for docs in collMentors.find():
     names.add(docs['name'])
@@ -52,7 +52,7 @@ class AddForm(FlaskForm):
 
 @app.route('/', methods=['POST', 'GET']) #TODO
 def main_page():
-    print(concentrations)
+    print(list_of_docs)
     return render_template('filter_page.html', names=names, concentrations=concentrations, courses = courses, helped = helped, list_of_docs = list_of_docs)
     # TODO: Handle serving the main page and AddForm submission here.
 
@@ -82,13 +82,14 @@ def remove_todo():
                     score += 1
         q.put((score, mentors["brown_id"]))
     listoftop = []
+    counter = 0
     while not q.empty():
         listoftop.append(q.get())
-    list_of_docs = []
-    print(listoftop)
+        counter += 1
+        if counter == 6:
+            break
     for id_s in listoftop:
-        print(id_s[1])
-        list_of_docs.append(collMentors.find({"brown_id" : id_s[1] }))[0]
+        list_of_docs.append(collMentors.find({ "brown_id" : id_s[1] })[0])
     return redirect("/")
 
     # TODO: Handle the POST request that removes batches of todo items
