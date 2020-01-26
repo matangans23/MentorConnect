@@ -43,6 +43,19 @@ app.config['SECRET_KEY'] = "blah vlah"
 
 Bootstrap(app)
 
+class UploadForm(FlaskForm):
+    file = FileField('Upload PDF Document', validators=[
+        FileRequired(),
+        FileAllowed(['pdf'], 'File extension must be ".pdf"')
+    ])
+    doc_type = RadioField('Document Type',
+                    default='resume',
+                    choices=[('resume','resume (most recent)'),
+                    ('cover-letter', 'cover letter (generic)'),
+                    ('transcript','transcript (most recent)')],
+                    validators=[DataRequired()])
+    submit = SubmitField('Submit')
+    
 class User(UserMixin):
 
     #initialize use with email and name. Initialized _id and password_hash to NOne
