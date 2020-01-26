@@ -270,8 +270,10 @@ def logout():
     flash('You have been logged out')
     return redirect(url_for('login'))
 
+global list_of_docs
 ##### Hossam's Stuff
 list_of_docs = []
+
 @app.route('/search', methods=['POST', 'GET']) #TODO
 def main_page():
     if mentor1 == "Mentee":
@@ -304,7 +306,9 @@ def main_page():
 
 @app.route("/query", methods=['POST']) #TODO
 def remove_todo():
-    print("Hello")
+    global list_of_docs
+    list_of_docs = None 
+    list_of_docs = []
     queryDict = {}
     if request.form.get('name') is not '':
         queryDict['name'] = request.form.get('name')
