@@ -44,6 +44,9 @@ for docs in collMentors.find():
     for help in docs['areas_of_help']:
         helped.add(help)
 
+global list_of_docs
+##### Hossam's Stuff
+list_of_docs = []
 @app.route('/search', methods=['POST', 'GET']) #TODO
 def main_page():
     print(list_of_docs)
@@ -53,6 +56,9 @@ def main_page():
 @app.route("/query", methods=['POST']) #TODO
 def remove_todo():
     print("Hello")
+    global list_of_docs
+    list_of_docs = None 
+    list_of_docs = []
     queryDict = {}
     if request.form.get('name') is not '':
         queryDict['name'] = request.form.get('name')

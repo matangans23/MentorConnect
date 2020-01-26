@@ -3,17 +3,17 @@
 
 {% block content %}
 <h1>Top Matches</h1>
-<form action="/interested" method="post">
+<form action="/interested" method="post" style="text-align: center; ">
 {% for entry in list %}
 
 <h1><input type="checkbox" name="checkbox" value='{{ entry.brown_id }}'>{{ entry.name }}</h1>
 <h2>{{ entry.email }}</h2>
 <h3> {{ entry.concentration }}</h3>
-<ul>
+<ul style= "list-style: none;">
     {% for class in entry.courses_taken %}
     <li>{{ class }}</li>
     {% endfor %}
-</ul>
+</ul >
 {% endfor %}
 <input type = "submit" id = "submit">
 </form>

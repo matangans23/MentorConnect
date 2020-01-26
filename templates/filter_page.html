@@ -13,7 +13,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css" type="text/css">
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.js"></script>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="static/css/style.css">
         <script src="filter.js"></script>
 <script src="filter1.js"></script>
 <script src="filter2.js"></script>
@@ -27,7 +27,7 @@
 <h2 style="text-align: center">Find a Mentor</h2>
     <div class = "category">
 
-<h3 style="position: relative; padding-left: 350px;">Search by:</h3>
+<h3 style="position: relative; text-align: center;">Search by:</h3>
       </div>
       <form action="/query" method="post">
         <table style="background-color: #ffffff; filter: alpha(opacity=40); opacity: 0.95;border:1px black solid;">
@@ -97,14 +97,16 @@
         </table>
       </form>
 
-<form action="/interested" method="post">
+{% if list_of_docs is not none %}
+<form action="/interested" method="post" style="text-align: center;" >
 
 {% for entry in list_of_docs %}
-<h1><input type="checkbox" name="checkbox" value='{{ entry.brown_id }}'>{{ entry.name }}</h1>
-<h2>Concentration:</h2>
-<h3>{{ entry.concentration }}</h3>
+<h1 style= "text-align: center;"><input type="checkbox" name="checkbox" value='{{ entry.brown_id }}'>{{ entry.name }}</h1>
+<h2 style= "text-align: center;">Concentration:</h2>
+<h3 style= "text-align: center;">{{ entry.concentration }}</h3>
 {% endfor %}
-<input type = "submit" id = "submit">
+<input type = "submit" id = "Choose Mentors" name= "Choose Mentors">
+{% endif %}
 </form>
 </body>
 </html>
