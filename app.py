@@ -9,7 +9,7 @@ from flask import render_template, redirect, request, url_for, flash, session
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DateTimeField, RadioField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DateTimeField, RadioField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional
 from flask_table import Table, Col
 from flask_pymongo import PyMongo
@@ -20,8 +20,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask import send_file, send_from_directory, safe_join, abort
 from flask import current_app
-
+from bson.json_util import dumps
+from pymongo import MongoClient
+import json
+import urllib
+from datetime import date
+import urllib.request
 import database_setup
+
+client = MongoClient('localhost', port=27018)
+
+db = client["mentor_connect"]
+
+collMentors = db["mentors"]
+collMentees = db["mentees"]
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "blah vlah"
@@ -31,6 +43,13 @@ app.config['SECRET_KEY'] = "blah vlah"
 
 Bootstrap(app)
 
+class UploadForm(FlaskForm):
+    file = FileField('Upload PDF Document', validators=[
+        FileRequired(),
+        FileAllowed(['pdf'], 'File extension must be ".pdf"')
+    ])
+    submit = SubmitField('Submit')
+    
 class User(UserMixin):
 
     #initialize use with email and name. Initialized _id and password_hash to NOne
@@ -39,24 +58,28 @@ class User(UserMixin):
         self.email = email
         self._id = None
         self.password_hash = None
-	
-	
+
+
 class LoginForm(FlaskForm):
     email_or_user = StringField('Email or username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Login')
 
-class RegistrationForm(FlaskForm):  
+class RegistrationForm(FlaskForm):
+    brown_id = StringField('Brown ID', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
     year = StringField('Year', validators=[DataRequired()])
     concentration =  StringField('Concentration', validators=[DataRequired()])
     courses_taken = StringField('Courses Taken', validators=[DataRequired()])
     planned = StringField('Courses Planned', validators=[DataRequired()])
-    helpp = StringField('Help', validators=[DataRequired()])
+    helpp = SelectMultipleField(u'Areas of Help/Advising', choices=[('Concentration Choice/Declaration',
+     'Concentration Choice/Declaration'), ('Course Plan', 'Course Plan'), ('Internship/Career Advice', 'Internship/Career Advice'),
+    ('Extracurriculars', 'Extracurriculars'),('Study Tips', 'Study Tips')])
+    #helpp = RadioField('Areas of Help', choices = [('Concentration Choice/Declaration', 'Concentration Choice/Declaration'),('Internship/Career Advice', 'Internship/Career Advice'), ('Course Plan', 'Course Plan'), ('Extracurriculars', 'Extracurriculars'), ('Study Tips', 'Study Tips')], validators=[DataRequired()])
     submit = SubmitField('Register')
 # class InformationForm(FlaskForm):
-#     name = StringField('Name',validators=[DataRequired()])
+#     name = StringField('Name',validators=[DataRequired()]), 
 #     year = StringField('Year', validators=[DataRequired()])
 #     concentration = StringField('Concentration',validators=[DataRequired()])
 #     courses_taken = String
@@ -68,7 +91,7 @@ class RegistrationForm(FlaskForm):
 login_manager = LoginManager(app)
 login_manager.login_view = 'login' # route or function where login occurs...
 
-    
+
 @app.route('/')
 @login_required
 def index():
@@ -92,10 +115,15 @@ def login():
 
     return render_template('user_login.html', form=form)
 
+
+
 @app.route('/register', methods=['GET','POST'])
 def register():
+    global user_info
+    user_info = None
     form = RegistrationForm()
     if form.validate_on_submit():
+        brown_id = form.brown_id.data
         name = form.name.data
         year = form.year.data
         concentration = form.concentration.data
@@ -104,69 +132,52 @@ def register():
         planned = form.planned.data
         planned = planned.split(", ")
         helpp = form.helpp.data
-        helpp = helpp.split(", ")
-        user.password = form.password.data # this calls the hash setter
-        database_setup.addMentee(name, year, concentration, courses_taken, planned, helpp)
-    return render_template('new_user.html',form = form)
+        print(type(helpp))
+        print(helpp)
+        # helpp = helpp.split(", ")
+        #ser.password = form.password.data # this calls the hash setter
+        database_setup.addMentee(brown_id, name, year, concentration, courses_taken, planned, helpp)
+        temp_id_dictionary = collMentees.find({"brown_id": brown_id})[0]
+        user_info = dict(temp_id_dictionary)
+        #user_info = dict(dumps(temp_id))
+
+        print(user_info)
+        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+        return redirect('/profile')
+    else:
+        return render_template('user_login.html',form = form)
+
     # return redirect(url_for('register'))
 
-
-@app.route('/profile', methods=['POST'])
+@app.route('/profile', methods=['GET','POST'])
 def add_information():
-	if request.method == 'POST': 
-		name = request.form.get["name"]
-		year = request.form['year']
-		concentration = request.form['concentration']
-		courses_taken = request.form['courses_taken']
-		courses_taken = list(courses_taken)
-		planned  = request.form['planned']
-		planned = list(planned)
-		helpp = request.form['help']
-		helpp = list(helpp)
-		database_setup.addMentee(name, year, concentration, courses_taken, planned, helpp)
-		print(type(request.form))
-		print(request.form)
-		return render_template('profile.html',form = request.form)
-	return render_template('profile.html')
-# @app.route('/profile', methods=['GET','POST'])
-# @login_required
-# def load_user_info():
+    print(user_info)
+    print(request.form)
+    documents()
+    print("YERRRRRRRRRRRRR")
+    return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'], form = form1)
 
-class UploadForm(FlaskForm):
-    file = FileField('Upload PDF Document', validators=[
-        FileRequired(),
-        FileAllowed(['pdf'], 'File extension must be ".pdf"')
-    ])
-    doc_type = RadioField('Document Type',
-                    default='resume',
-                    choices=[('resume','resume (most recent)'),
-                    ('cover-letter', 'cover letter (generic)'),
-                    ('transcript','transcript (most recent)')],
-                    validators=[DataRequired()])
-    submit = SubmitField('Submit')
-
-
-@app.route('/documents', methods=['GET', 'POST'])
-@login_required
 def documents():
-    form = UploadForm(method='POST')
+    global form1
+    form1 = UploadForm(method='POST')
+    multiselect = request.form.getlist('mymultiselect')
     user_id = session.get('user_id')
-#    with open('file.pdf', 'wb+') as f:
-#        cursor = db.documents.find()
-#        k = 0
-#        for i in cursor:
-#            if k == 2:
-#                f.write(i['file'])
-#            k += 1
-    if form.submit.data and form.validate_on_submit():
+    with open('file.pdf', 'wb+') as f:
+       cursor = db.documents.find()
+       k = 0
+       for i in cursor:
+           if k == 2:
+               f.write(i['file'])
+           k += 1
+    if form1.submit.data and form1.validate_on_submit():
         print(form.doc_type.data)
-        filename = secure_filename(form.file.data.filename)
-        doc_type = form.doc_type.data
-        bytes_file = form.file.data.read()
+        filename = secure_filename(form1.file.data.filename)
+        doc_type = form1.doc_type.data
+        bytes_file = form1.file.data.read()
         curr_dir = os.getcwd()
         dir_path = curr_dir + "/static/client/" + user_id + "/" # appended / at the end of str
         if not os.path.exists(dir_path):
-            # do not need to change dir_path here 
+            # do not need to change dir_path here
             os.mkdir(dir_path)
         with open(dir_path + doc_type +'.pdf', 'wb+') as f:
             f.write(bytearray(bytes_file))
@@ -179,11 +190,14 @@ def documents():
             }
         db.documents.remove({'$and' : [{'user_id' : ObjectId(user_id)},{'doc_type' : doc_type}]})
         db.documents.insert_one(new_doc_for_mongo)
-        form.file.data = ''
-        return redirect(url_for('documents'))
+        form1.file.data = ''
+        print('HAYYYYYYYYYYYYYYYYYYYYY')
+        
+
+        #return redirect(url_for('documents'))
     documents = list(db.documents.find({'user_id' : ObjectId(user_id)}))
 
-    return render_template('documents.html', form=form, documents=documents)
+    # return render_template('documents.html', form=form, documents=documents)
 
 @app.route("/get-pdf/<pdf_id>")
 @login_required
@@ -210,6 +224,6 @@ def logout():
 
 
 
-    
+
 if __name__ == '__main__':
  app.run(debug=True, port=5000)
