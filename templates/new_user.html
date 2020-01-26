@@ -1,7 +1,5 @@
-{% extends "layout.html" %}
-
-
-{% block title %}Register Page{% endblock %}
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
 <div class="container">
@@ -21,6 +19,10 @@
     <hr/>
     <a href="/login">Login existing user</a>
   </div>
+  <div class = "col-md">
+       <img src="../static/logo.png">
+       </div>
+</div>
 </div>
 
 {% endblock %}
