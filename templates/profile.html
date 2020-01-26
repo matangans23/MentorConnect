@@ -1,5 +1,4 @@
 {% extends "layout.html" %}
-{{ super() }}
 
 {% block content %}
 
@@ -14,20 +13,30 @@
       <li> {{ course }} </li>
     {% endfor %}
   </ul>
-  {% if planned is not none %}
-    <h1> Tentative Courses: </h1>
-    <ul id = 'tentative_courses' >
+     {% if planned is not none %}
+    <h3> <b>Tentative Courses: </b></h3>
+    <ul id = 'tentative_courses'style="list-style: none;">
       {% for course in planned %}
       <li> {{ course }}  </li>
       {% endfor %}
-    </ul>
     {% endif %}
-    <h1> Areas I would like help in: </h1>
-    <ul id = 'areas of help' >
+    </ul>
+    <h3><b> Areas I would like mentorship in: </b></h3>
+    <ul id = 'areas of help' style="list-style: none;">
     {% for area in helpp %}
     <li> {{ area }} </li>
     {% endfor %}
     </ul>
+    {% if matched is not none %}
+  <h1>Matched:</h1>
+  <ul>
+    {% for match in matched %}
+    <li><h3>{{ match.name }}</h3></li>
+    <li><h4>{{ match.email }}</h4></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+    </div>
   {% if matched is not none %}
   <h1>Matched:</h1>
   <ul>
@@ -49,59 +58,6 @@
     <hr/>
   </div>
 </div>
-
-<!-- Added content below -->
-
-<!-- <div class="container">
-  <h3>Documents</h3>
-
-  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#ModalUploadForm">
-    Add Document
-  </button>
-</div>
-<!-- Modal HTML Markup -->
-<div id="ModalUploadForm" class="modal fade">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title">Add Picture</h1>
-            </div>
-            <div class="modal-body">
-              {{ wtf.quick_form(form) }}
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-    <main role="main">
-      <br/>
-      <div class="album py-5 bg-light">
-        <div class="container">
-
-          <div class="row">
-            {% for doc in documents %}
-            <div class="col-md-4">
-              <div class="card mb-4 box-shadow">
-                <img class="card-img-top" alt="JPG [100%x225]" style="height: 225px; width: 100%; display: block;" src="../static/images/pdf_image2.png" data-holder-rendered="true">
-                <h2 class="card-title"> {{ doc.doc_type }} </h2>
-                <div class="card-body">
-                  <p class="card-text"> {{ doc.filename }}</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <a href="/get-pdf/{{ doc.doc_type }}.pdf" class="button">Download Image</a>
-                    </div>
-                    <small class="text-muted">9 mins</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {% endfor %}
-
-          </div>
-        </div>
-      </div>
-
-    </main>
 
 {% endblock %}
 {% block scripts %}
