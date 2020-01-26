@@ -1,6 +1,71 @@
 {% extends "layout.html" %}
+{% extends "layout.html" %}
+{{ super() }}
 
+{% block content %}
 
+<div class="container">
+  <h3>Documents</h3>  
+  
+  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#ModalUploadForm">
+    Add Document
+  </button>
+</div>
+<!-- Modal HTML Markup -->
+<div id="ModalUploadForm" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title">Add Document</h1>
+            </div>
+            <div class="modal-body">
+              {{ wtf.quick_form(form) }}
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+    <main role="main">
+      <br/>
+      <div class="album py-5 bg-light">
+        <div class="container">
+
+          <div class="row">
+            {% for doc in documents %}
+            <div class="col-md-4">
+              <div class="card mb-4 box-shadow">
+                <img class="card-img-top" alt="PDF [100%x225]" style="height: 225px; width: 100%; display: block;" src="../static/images/pdf_image2.png" data-holder-rendered="true">
+                <h2 class="card-title"> {{ doc.doc_type }} </h2>
+                <div class="card-body">
+                  <p class="card-text"> {{ doc.filename }}</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                      <a href="/get-pdf/{{ doc.doc_type }}.pdf" class="button">Download PDF</a>
+                    </div>
+                    <small class="text-muted">9 mins</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+            
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+    $(document).ready(function () {
+      $('#ModalUploadForm').attr("enctype", "multipart/form-data")
+    })
+</script> 
+{% endblock %}
+# ENDS AND BEGINS HERE 
 {% block title %}Profile Page{% endblock %}
 
 {% block content %}
