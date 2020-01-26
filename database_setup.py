@@ -12,6 +12,7 @@ collMentors = db["mentors"]
 collMentors.drop()
 collMentees = db["mentees"]
 collMentees.drop()
+
 def addMentee(brown_id, name, year, concentration, courses_taken, planned_courses, areas_of_help):
     to_load = {
         "brown_id": brown_id,
@@ -22,15 +23,16 @@ def addMentee(brown_id, name, year, concentration, courses_taken, planned_course
         "planned_courses" : planned_courses,
         "areas_of_help" : areas_of_help
     }
+    print(to_load)
     collMentees.insert_one(to_load)
 
-def addMentor(brown_id, name, year, concentration, courses, areas_of_help):
+def addMentor(brown_id, name, year, concentration, courses_taken, areas_of_help):
     to_load = {
         "brown_id" : brown_id,
         "name" : name,
         "year" : year,
         "concentration" : concentration,
-        "courses" : courses,
+        "courses_taken" : courses_taken,
         "areas_of_help" : areas_of_help
     }
     collMentors.insert_one(to_load)

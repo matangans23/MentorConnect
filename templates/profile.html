@@ -15,12 +15,14 @@
       <li> {{ course }} </li>
     {% endfor %}
   </ul>
+  {% if planned is not none %}
     <h1> Tentative Courses: </h1>
     <ul id = 'tentative_courses' >
       {% for course in planned %}
       <li> {{ course }}  </li>
       {% endfor %}
     </ul>
+    {% endif %}
     <h1> Areas I would like help in: </h1>
     <ul id = 'areas of help' >
     {% for area in helpp %}
