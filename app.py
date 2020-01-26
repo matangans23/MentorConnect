@@ -45,20 +45,7 @@ print("hey")
 #db = mongo.db
 
 Bootstrap(app)
-list_of_docs = []
 
-names = set()
-concentrations = set()
-courses = set()
-helped = set()
-
-for docs in collMentors.find():
-    names.add(docs['name'])
-    concentrations.add(docs['concentration'])
-    for course in docs['courses_taken']:
-        courses.add(course)
-    for help in docs['areas_of_help']:
-        helped.add(help)
 class UploadForm(FlaskForm):
     file = FileField('Upload Profile Picture', validators=[
         FileRequired(),
@@ -84,12 +71,13 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class RegistrationForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired()])
     brown_id = StringField('Brown ID', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
     year = StringField('Year', validators=[DataRequired()])
     concentration =  StringField('Concentration', validators=[DataRequired()])
     courses_taken = StringField('Courses Taken', validators=[DataRequired()])
-    planned = StringField('Courses Planned', validators=[DataRequired()])
+    planned = StringField('Courses Planned')
     helpp = SelectMultipleField(u'Areas of Help/Advising', choices=[('Concentration Choice/Declaration',
      'Concentration Choice/Declaration'), ('Course Plan', 'Course Plan'), ('Internship/Career Advice', 'Internship/Career Advice'),
     ('Extracurriculars', 'Extracurriculars'),('Study Tips', 'Study Tips')])
@@ -132,14 +120,21 @@ def login():
 
     if form.validate_on_submit():
         if form.mentee.data == "Mentor":
-            user_info = collMentors.find({"brown_id" : form.email_or_user.data})[0]
-            mentor1 = "Mentor"
+            print("yee")
+            if collMentors.find({"brown_id" : form.email_or_user.data}).count() > 0:
+                user_info = collMentors.find({"brown_id" : form.email_or_user.data})[0]
+                mentor1 = "Mentor"
+            else:
+                flash('invalid username or password.')
         else:
-            user_info = collMentees.find({"brown_id" : form.email_or_user.data})[0]
-            mentor1 = "Mentee"
+            if collMentees.find({"brown_id" : form.email_or_user.data}).count() > 0:
+                user_info = collMentees.find({"brown_id" : form.email_or_user.data})[0]
+                mentor1 = "Mentee"
+            else:
+                flash('invalid username or password.')
+        print(user_info)
         if user_info is not None: #and (user == mentee or user== mentor):# user.verify_password(form.password.data):
             return redirect('/profile')
-        flash('invalid username or password.')
 
     return render_template('user_login.html', form=form)
 
@@ -153,6 +148,7 @@ def register():
     mentor1 = None
     form = RegistrationForm()
     if form.validate_on_submit():
+        email = form.email.data
         brown_id = form.brown_id.data
         name = form.name.data
         year = form.year.data
@@ -165,10 +161,10 @@ def register():
         mentor1 = form.mentee.data
         temp_id_dictionary = {}
         if mentor1 == "Mentor":
-            database_setup.addMentor(brown_id, name, year, concentration, courses_taken, helpp)
+            database_setup.addMentor(email, brown_id, name, year, concentration, courses_taken, helpp)
             temp_id_dictionary = collMentors.find({"brown_id": brown_id})[0]
         else:
-            database_setup.addMentee(brown_id, name, year, concentration, courses_taken, planned, helpp)
+            database_setup.addMentee(email, brown_id, name, year, concentration, courses_taken, planned, helpp)
             temp_id_dictionary = collMentees.find({"brown_id": brown_id})[0]
         user_info = dict(temp_id_dictionary)
 
@@ -192,10 +188,21 @@ def add_information():
     print("YERRRRRRRRRRRRR")
     print(mentor1)
     if mentor1 == "Mentor":
-        return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = None, helpp = user_info['areas_of_help'], form=form1)
+        matched = None
+        counter = 0
+        for id1 in user_info['matched']:
+            if counter == 0:
+                matched = []
+            matched.append(collMentees.find( {'brown_id' : id1})[0])
+        return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = None, helpp = user_info['areas_of_help'], form=form1, matched=matched)
     else:
-        return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'], form=form1)
-    return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'], form=form1)
+        matched = None
+        counter = 0
+        for id1 in user_info['matched']:
+            if counter == 0:
+                matched = []
+            matched.append(collMentors.find( {'brown_id' : id1})[0])
+        return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'], form=form1, matched=matched)
 
 def documents():
     global form1
@@ -264,12 +271,36 @@ def logout():
     return redirect(url_for('login'))
 
 ##### Hossam's Stuff
-
+list_of_docs = []
 @app.route('/search', methods=['POST', 'GET']) #TODO
 def main_page():
-    print(list_of_docs)
-    return render_template('filter_page.html', names=names, concentrations=concentrations, courses = courses, helped = helped, list_of_docs = list_of_docs)
-    # TODO: Handle serving the main page and AddForm submission here.
+    if mentor1 == "Mentee":
+        names = set()
+        concentrations = set()
+        courses = set()
+        helped = set()
+        for docs in collMentors.find():
+            names.add(docs['name'])
+            concentrations.add(docs['concentration'])
+            for course in docs['courses_taken']:
+                courses.add(course)
+            for help in docs['areas_of_help']:
+                helped.add(help)
+        return render_template('filter_page.html', names=names, concentrations=concentrations, courses = courses, helped = helped, list_of_docs = list_of_docs)
+    else:
+        names = set()
+        concentrations = set()
+        courses = set()
+        helped = set()
+        for docs in collMentees.find():
+            names.add(docs['name'])
+            concentrations.add(docs['concentration'])
+            for course in docs['courses_taken']:
+                courses.add(course)
+            for help in docs['areas_of_help']:
+                helped.add(help)
+        return render_template('filter_page.html', names=names, concentrations=concentrations, courses = courses, helped = helped, list_of_docs = list_of_docs)
+    #  TODO: Handle serving the main page and AddForm submission here.
 
 @app.route("/query", methods=['POST']) #TODO
 def remove_todo():
@@ -312,5 +343,21 @@ def top():
     if mentor1 == "Mentee":
         sugg = suggestions.suggest(user_info["brown_id"])
         return render_template("top_res.html", list=sugg)
-    return redirect(url_for('login'))
+    else:
+        lis = user_info['matched']
+        interested_mentees = []
+        for id1 in lis:
+            interested_mentees.append(collMentees.find( {'brown_id' : id1})[0])
+        return render_template("top_res.html", list=interested_mentees)
+@app.route('/interested', methods=["POST"])
+def interested():
+    if mentor1 == "Mentee":
+        lis = request.form.getlist('checkbox')
+        for x in lis:
+            collMentors.update({'brown_id': x}, {'$push': {'matched': user_info['brown_id']}})
+    if mentor1 == "Mentor":
+        lis = request.form.getlist('checkbox')
+        for x in lis:
+            collMentees.update({'brown_id': x}, {'$push': {'matched': user_info['brown_id']}})
+    return redirect("/profile")
 app.run()

@@ -2,7 +2,6 @@
 {{ super() }}
 
 {% block content %}
-{% block title %} Profile Page {% endblock %}
 
 <div class="container">
   <div class="page-header">
@@ -29,6 +28,15 @@
     <li> {{ area }} </li>
     {% endfor %}
     </ul>
+  {% if matched is not none %}
+  <h1>Matched:</h1>
+  <ul>
+    {% for match in matched %}
+    <li><h3>{{ match.name }}</h3></li>
+    <li><h4>{{ match.email }}</h4></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
     {% for message in get_flashed_messages() %}
     <div class="alert alert-warning">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -44,7 +52,7 @@
 
 <!-- Added content below -->
 
-<div class="container">
+<!-- <div class="container">
   <h3>Documents</h3>
 
   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#ModalUploadForm">
@@ -102,7 +110,7 @@
     $(document).ready(function () {
       $('#ModalUploadForm').attr("enctype", "multipart/form-data")
     })
-</script>
+</script> -->
 {% endblock %}
 
 <!-- added new stuff here-->

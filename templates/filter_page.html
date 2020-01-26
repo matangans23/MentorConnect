@@ -172,12 +172,13 @@
         </table>
       </form>
 
+<form action="/interested" method="post">
 
 {% for entry in list_of_docs %}
-<h1> {{ entry.name }}</h1>
+<h1><input type="checkbox" name="checkbox" value='{{ entry.brown_id }}'>{{ entry.name }}</h1>
 <h2>Classes Taken:</h2>
 <ul>
- {% for class in entry.courses %}
+ {% for class in entry.courses_taken %}
     <li> {{ class }}</li>
  {% endfor %}
  </ul>
@@ -188,6 +189,8 @@
  {% endfor %}
 </ul>
 {% endfor %}
+<input type = "submit" id = "submit">
+</form>
 </body>
 </html>
 <!-- {% endblock %} -->

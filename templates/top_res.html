@@ -2,11 +2,12 @@
 {{ super() }}
 
 {% block content %}
-{% block title %} Profile Page {% endblock %}
-
+<h1>Top Matches</h1>
+<form action="/interested" method="post">
 {% for entry in list %}
 
-<h1>{{ entry.name }}</h1>
+<h1><input type="checkbox" name="checkbox" value='{{ entry.brown_id }}'>{{ entry.name }}</h1>
+<h2>{{ entry.email }}</h2>
 <h3> {{ entry.concentration }}</h3>
 <ul>
     {% for class in entry.courses_taken %}
@@ -14,5 +15,7 @@
     {% endfor %}
 </ul>
 {% endfor %}
+<input type = "submit" id = "submit">
+</form>
 
 {% endblock %}
