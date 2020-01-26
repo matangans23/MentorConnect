@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{{ super() }}
+
+{% block title %}Login Page{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="page-header">
+    <h1>Registration</h1>
+
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+  </div>
+  <div class="col-md-4">
+    {{ wtf.quick_form(form) }}
+    <hr>
+<!-- <form method = "POST" action = "/profile">
+  Concentration Choice/Declaration <input type = "checkbox" value = "Concentration Choice/Declaration" name="box">
+  Course Plan <input type = "checkbox" value = "Course Plan" name="box">
+  Internship/Career Advice <input type = "checkbox" value = "Internship/Career Advice" name="box">
+  Extracurriculars <input type = "checkbox" value = "Extracurriculars" name="box">
+  Study Tips <input type = "checkbox" value = "Study Tips" name="box">
+  <input type="submit" name="Submit">
+</form> -->
+    <a href="/register">Register new user</a>
+  </div>
+
+</div>
+
+{% endblock %}
