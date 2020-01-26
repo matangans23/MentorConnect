@@ -48,12 +48,6 @@ class UploadForm(FlaskForm):
         FileRequired(),
         FileAllowed(['pdf'], 'File extension must be ".pdf"')
     ])
-    doc_type = RadioField('Document Type',
-                    default='resume',
-                    choices=[('resume','resume (most recent)'),
-                    ('cover-letter', 'cover letter (generic)'),
-                    ('transcript','transcript (most recent)')],
-                    validators=[DataRequired()])
     submit = SubmitField('Submit')
     
 class User(UserMixin):
@@ -160,22 +154,13 @@ def add_information():
     print(user_info)
     print(request.form)
     documents()
-    UploadForm()
-    multiselect = request.form.getlist('mymultiselect')
-    return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'])
-
-
-
-def load_user_info():
-    class UploadForm(FlaskForm):
-        file = FileField('Upload PDF Document', validators=[
-          FileRequired(),
-        FileAllowed(['jpg', 'png'], 'File extension must be ".png" or ".jpg')
-    ])
-        submit = SubmitField('Submit')
+    print("YERRRRRRRRRRRRR")
+    return render_template('profile.html', brown_id = user_info['brown_id'], year = user_info['year'], concentration = user_info['concentration'],   name=user_info['name'], courses_taken = user_info['courses_taken'], planned = user_info['planned_courses'], helpp = user_info['areas_of_help'], form = form1)
 
 def documents():
-    form = UploadForm(method='POST')
+    global form1
+    form1 = UploadForm(method='POST')
+    multiselect = request.form.getlist('mymultiselect')
     user_id = session.get('user_id')
     with open('file.pdf', 'wb+') as f:
        cursor = db.documents.find()
@@ -184,11 +169,11 @@ def documents():
            if k == 2:
                f.write(i['file'])
            k += 1
-    if form.submit.data and form.validate_on_submit():
+    if form1.submit.data and form1.validate_on_submit():
         print(form.doc_type.data)
-        filename = secure_filename(form.file.data.filename)
-        doc_type = form.doc_type.data
-        bytes_file = form.file.data.read()
+        filename = secure_filename(form1.file.data.filename)
+        doc_type = form1.doc_type.data
+        bytes_file = form1.file.data.read()
         curr_dir = os.getcwd()
         dir_path = curr_dir + "/static/client/" + user_id + "/" # appended / at the end of str
         if not os.path.exists(dir_path):
@@ -205,11 +190,14 @@ def documents():
             }
         db.documents.remove({'$and' : [{'user_id' : ObjectId(user_id)},{'doc_type' : doc_type}]})
         db.documents.insert_one(new_doc_for_mongo)
-        form.file.data = ''
-       # return redirect(url_for('documents'))
-   # documents = list(db.documents.find({'user_id' : ObjectId(user_id)}))
+        form1.file.data = ''
+        print('HAYYYYYYYYYYYYYYYYYYYYY')
+        
 
-    return render_template('documents.html', form=form, documents=documents)
+        #return redirect(url_for('documents'))
+    documents = list(db.documents.find({'user_id' : ObjectId(user_id)}))
+
+    # return render_template('documents.html', form=form, documents=documents)
 
 @app.route("/get-pdf/<pdf_id>")
 @login_required
