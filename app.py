@@ -17,7 +17,7 @@ from bson import Binary
 from bson.objectid import ObjectId
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 from flask import send_file, send_from_directory, safe_join, abort
 from flask import current_app
 
